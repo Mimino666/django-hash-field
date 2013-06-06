@@ -18,11 +18,9 @@ class HashField(models.CharField):
         '''
         self.original = original
         kwargs['max_length'] = 40
-        # always create an index. Otherwise what is the point of storing the
-        # hashed value?
-        kwargs['db_index'] = True
         kwargs['null'] = False
-        kwargs['editable'] = False
+        kwargs.setdefault('db_index', True)
+        kwargs.setdefault('editable', False)
         super(HashField, self).__init__(*args, **kwargs)
 
     def calculate_hash(self, model_instance):
