@@ -34,7 +34,7 @@ class HashField(models.CharField):
         return super(HashField, self).pre_save(model_instance, add)
 
 
-# This tell South, how to store your field.
+# This tells South, how to store the field.
 # more information: http://south.readthedocs.org/en/0.7.6/customfields.html
 add_introspection_rules([
     (
@@ -46,3 +46,22 @@ add_introspection_rules([
     ),
 ],
 ["^myproject\.fields\.HashField"])  # use your own path to HashField
+
+
+class HashMixin(object):
+    '''Model mixin for easy work with HashFields.'''
+
+    def calculate_hashes(self):
+        '''Calculate hashes of all the HashFields in the model.
+        '''
+        hashed_fields = [field for field in self._meta.fields
+                         if isinstance(field, HashField)]
+        for field in hashed_fields:
+            field.calculate_hash(self)
+
+    @classmethod
+    def calculate_hash(cls, value):
+        '''Calculate hash of the given value, which belongs to no specific
+        field.
+        '''
+        return _hashit(value)
